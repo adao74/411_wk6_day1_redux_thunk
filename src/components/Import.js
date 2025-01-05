@@ -5,26 +5,35 @@ import { MoreVert } from '@mui/icons-material';
 const Import = (props) => {
     // State for menu anchor (open/close position)
     const [anchorEl, setAnchorEl] = useState(null);
+    const [menuRowIndex, setMenuRowIndex] = useState(null); // Tracks the index of the row
     const rows = props.makes;
 
     // Handle opening the menu
-    const handleClick = (event) => {
-        setAnchorEl(event.currentTarget);
+    const handleClick = (event, index) => {
+        setAnchorEl(event.currentTarget); // Set the menu position
+        setMenuRowIndex(index); // Track the index of the clicked row
     };
 
     // Handle closing the menu
     const handleClose = () => {
-        setAnchorEl(null);
+        setAnchorEl(null); // Close the menu
+        setMenuRowIndex(null); // Reset the index
     };
 
     // Handle deleting the car from the table
     const deleteMake = () => {
-
-    }
+        if (menuRowIndex !== null) {
+            props.removeCar(menuRowIndex); // Perform delete based on row index
+        }
+        handleClose(); // Close the menu after deleting
+    };
 
     return (
         <>
-            <Button variant="contained" color="primary" onClick={props.fetchMakes}>Contained</Button>
+            <h2>COUNT: {props.makes.length}</h2>
+            <Button variant="contained" color="primary" onClick={props.fetchMakes}>
+                Contained
+            </Button>
 
             <Table sx={{ minWidth: 650 }} aria-label="simple table">
                 <TableHead>
@@ -35,7 +44,7 @@ const Import = (props) => {
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {rows.map((row) => (
+                    {rows.map((row, index) => (
                         <TableRow
                             key={row.MakeId}
                             sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
@@ -43,8 +52,8 @@ const Import = (props) => {
                             <TableCell align="right">{row.MakeId}</TableCell>
                             <TableCell align="right">{row.MakeName}</TableCell>
                             <TableCell align="right">
-                                {/* MoreVert button to open the menu */}
-                                <MoreVert onClick={handleClick} />
+                                {/* Pass index to handleClick */}
+                                <MoreVert onClick={(event) => handleClick(event, index)} />
                             </TableCell>
                         </TableRow>
                     ))}
@@ -53,11 +62,13 @@ const Import = (props) => {
 
             {/* Menu component */}
             <Menu
-                anchorEl={anchorEl}
-                open={Boolean(anchorEl)}
-                onClose={handleClose}
+              anchorEl={anchorEl}
+              open={Boolean(anchorEl)}
+              onClose={handleClose}
+              disableAutoFocus
+              disableEnforceFocus
             >
-                <MenuItem onClick={deleteMake}>Action 1</MenuItem>
+              <MenuItem onClick={deleteMake}>Delete Make</MenuItem>
             </Menu>
         </>
     );
